@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Cites</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<h1>Живой поиск</h1>
+<form action="" method="get">
+    <input type="text" class="search-box" id="search-box" autocomplete="off">
+    <input type="button" class="button" id="button" value="Поиск">
+</form>
+<div class="search-area" id="search-area"></div>
+<script>
+    var spell;
+    var cites = {
+        "Владивосток": 1,
+        "Екатеринбург": 2,
+        "Бийск": 3,
+        "Новосибирск": 4,
+        "Санкт-Петербург": 5,
+        "Москва": 6,
+        "Красноярск": 7
+    };
+    $('#button').on('click', function(event){
+        $('#search-area').html("").show();
+        spell = $('#search-box').val();
+        $.each(cites, function(key, val) {
+            spell = spell.trim();
+            if((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1){
+                $('#search-area').show();
+                $('#search-area').append('<p>'+ key +'</p>')
+            }
+        });
+    });
+    $('#search-box').keyup(function(event){
+        if($(this).val().length>=2) {
+            $('#search-area').html("").show();
+            spell = $('#search-box').val();
+            $.each(cites, function (key, val) {
+                spell = spell.trim();
+                if ((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1) {
+                    $('#search-area').show();
+                    $('#search-area').append('<p>' + key + '</p>')
+                }
+            });
+        }
+    });
+
+</script>
+</body>
+</html>
