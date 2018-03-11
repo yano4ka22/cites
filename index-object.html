@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Cites Object</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<h1>Живой поиск</h1>
+<form action="" method="get">
+    <input type="text" class="search-box" id="search-box" autocomplete="off">
+    <input type="button" class="button" id="button" value="Поиск">
+</form>
+<div class="search-area" id="search-area"></div>
+<script>
+    var autocomplete = {
+        spell: '',
+        count: -1,
+        SELECTOR: null,
+        init: function (selector) {
+            var self = this;
+            self.SELECTOR = selector;
+            console.log(self);
+        },
+        bttonClick: function(event){
+            searchArea.html("").show();
+            spell = $('#search-box').val();
+            $.each(cites, function(key, val) {
+                spell = spell.trim();
+                if((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1){
+                    searchArea.show();
+                    searchArea.append('<p>'+ key +'</p>')
+                }
+            });
+        },
+        enterLetters: function(event){
+            if (event.keyCode == 40 || event.keyCode == 38 || event.keyCode == 13) {
+                return;
+            } else if($(this).val().length >= 2) {
+                searchArea.html("").show();
+                spell = $('#search-box').val();
+                $.each(cites, function (key, val) {
+                    spell = spell.trim();
+                    if ((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1) {
+                        searchArea.show();
+                        searchArea.append('<p class="get-cites">' + key + '</p>');
+                    }
+                });
+            } else if ($(this).val().length <= 2) {
+                $('.get-cites').remove();
+                searchArea.html("").hide();
+            }
+        }
+
+    }
+
+
+
+
+
+autocomplete.init("asds");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    var spell;
+    var count = -1;
+    var cites = {
+        "Владивосток": 1,
+        "Екатеринбург": 2,
+        "Бийск": 3,
+        "Новосибирск": 4,
+        "Санкт-Петербург": 5,
+        "Москва": 6,
+        "Красноярск": 7,
+        "Абакан": 8,
+        "Анапа": 9,
+        "Ангарск": 10,
+        "Владимир": 11,
+        "Горно-Алтайск": 12,
+        "Дмитров": 13,
+        "Ессентуки": 14
+    };
+    var searchArea = $('#search-area');
+    $('#button').on('click', function(event){
+        searchArea.html("").show();
+        spell = $('#search-box').val();
+        $.each(cites, function(key, val) {
+            spell = spell.trim();
+            if((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1){
+                searchArea.show();
+                searchArea.append('<p>'+ key +'</p>')
+            }
+        });
+    });
+    $('#search-box').keyup(function(event){
+        if (event.keyCode == 40 || event.keyCode == 38 || event.keyCode == 13) {
+            return;
+        } else if($(this).val().length >= 2) {
+            searchArea.html("").show();
+            spell = $('#search-box').val();
+            $.each(cites, function (key, val) {
+                spell = spell.trim();
+                if ((key.indexOf(spell) != -1) || (key.toLowerCase().indexOf(spell)) != -1) {
+                    searchArea.show();
+                    searchArea.append('<p class="get-cites">' + key + '</p>');
+                }
+            });
+        } else if ($(this).val().length <= 2) {
+            $('.get-cites').remove();
+            searchArea.html("").hide();
+        }
+    });
+    var searchAreaClick = document.getElementById('search-area');
+    var searchBox = document.getElementById('search-box');
+    searchAreaClick.addEventListener('click', function (event) {
+        var target = event.target;
+        document.getElementById("search-box").value = target.textContent;
+        $('.get-cites').remove();
+        searchArea.html("").hide();
+    });
+    window.onload = function() {
+        searchBox.addEventListener ('keydown', function (event) {
+            var getCites = $('.get-cites');
+            if(event.keyCode == 40){
+                getCites.eq(count).css('background','transparent');
+                if(count >= getCites.length - 1) count = -1;
+                count++;
+                getCites.eq(count).css('background','darkgray');
+            } else if(event.keyCode == 38){
+                getCites.eq(count).css('background','transparent');
+                if(count <= -1) count = 2;
+                count--;
+                getCites.eq(count).css('background','darkgray');
+            } else if(event.keyCode == 13) {
+                event.preventDefault();
+                document.getElementById("search-box").value = getCites[count].textContent;
+                getCites.remove();
+                searchArea.html("").hide();
+            }
+        });
+    }
+
+
+
+</script>
+</body>
+</html>
