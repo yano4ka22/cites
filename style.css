@@ -11,9 +11,12 @@
 }
 .search-area {
     display: none;
-    width: 243px;
+    width: 253px;
     min-height: 50px;
     border: 1px solid darkgray;
     margin-top: 5px;
-    padding: 5px;
+}
+.search-area .get-cites {
+    margin: 0;
+    padding: 10px 5px;
 }
