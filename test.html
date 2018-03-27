@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    //Менеджер popup окон
+    var popupManager = {
+        POPUP_CONTAINER_TEMPLATE_SELECTOR: '#popupContainerTemplate',
+        POPUP_CONTAINER_OBJECT_SELECTOR: '#popupContainer',
+        REQUEST_STATUS_OK: 1,
+        REQUEST_STATUS_VALIDATION_ERROR: 2,
+        REQUEST_STATUS_SERVER_ERROR: 3,
+        lastPopupId: false,
+        popupShowed: false,
+        $currentPopupContainerObject: false,
+        afterOpenPopup: function () {
+            $('.popup-bg.popup-bg-0').addClass('register-scroll')
+            popupManager.$currentPopupContainerObject.css('display', 'block')
+                .removeClass('animated')
+                .removeClass('fadeOut')
+                .addClass('animated fadeIn').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                popupManager.$currentPopupContainerObject.css('display', 'block');
+            });
+            popupManager.setStaticSizeToPopupBgContainer(false);
+            popupManager.initDefaultEvents(popupManager.$currentPopupContainerObject);
+        },
+        afterClosePopup: function () {
+            if (popupManager.$currentPopupContainerObject !== false) {
+                $('.popup-bg.popup-bg-0').remove('regsister-scroll');
+                popupManager.$currentPopupContainerObject
+                    .addClass('animated fadeOut')
+                    .one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                        popupManager.$currentPopupContainerObject.css('display', 'none');
+                    }).delay(1000).queue(function () {
+                    popupManager.$currentPopupContainerObject.remove();
+                    popupManager.$currentPopupContainerObject = false;
+                });
+            }
+            else {
+                popupManager.$currentPopupContainerObject = false;
+            }
+            popupManager.popupShowed = false;
+            popupManager.lastPopupId = false;
+        },
+        openPopup: function (popupId) {
+            var $popupContainer;
+            popupId = popupId + 'Logic';
+            if (window[popupId] === undefined) {
+                return false;
+            }
+//Отключаем работу предыдущего блока, если он был подключен
+            if (popupManager.lastPopupId !== false) {
+                if (window[popupManager.lastPopupId]['close'] !== undefined) {
+                    window[popupManager.lastPopupId].close();
+                }
+                $popupContainer = popupManager.$currentPopupContainerObject;
+                var $popupBgContainer = $popupContainer.find('.popup-bg');
+//Фиксация размера фона на время открытия следующего блока
+                popupManager.setStaticSizeToPopupBgContainer(true, $popupContainer);
+                $popupBgContainer.html('');
+            }
+            else {
+                $popupContainer = popupManager.preparePopupContainerObject();
+            }
+            popupManager.setClosePopupButtonFromTemplate();
+            popupManager.lastPopupId = popupId;
+            window[popupId].open($popupContainer.find('.popup-bg'), function () {
+                popupManager.afterOpenPopup();
+                $('.page').addClass('fixed-container');
+            });
+            popupManager.popupShowed = true;
+        },
+        closePopup: function (popupId, softClose) {
+            if (!popupManager.popupShowed) {
+                return false;
+            }
+            if ((popupId === undefined) || (popupId === false)) {
+                popupId = popupManager.lastPopupId;
+            }
+            if (popupId === false) {
+                popupManager.afterClosePopup();
+                return true;
+            }
+            if (softClose === undefined) {
+                softClose = true;
+            }
+            if (softClose) {
+                window[popupManager.lastPopupId].close();
+            }
+            popupManager.afterClosePopup();
+            $('.page').removeClass('fixed-container');
+        },
+        setClosePopupButtonFromTemplate: function () {
+            var $btnTemplate = $('.popup-close-btn.template').clone().removeClass('template');
+            $btnTemplate.appendTo(popupManager.$currentPopupContainerObject.find('.popup-bg'));
+        },
+        loadPopupFromButton: function () {
+            var popupId = $(this).attr('popup-id');
+            if (popupId !== undefined) {
+                popupManager.loadPopupFromButton(popupId);
+            }
+        },
+        setStaticSizeToPopupBgContainer: function (setStatic, $container) {
+            if ($container === undefined) {
+                $container = popupManager.$currentPopupContainerObject;
+            }
+            var $popupBgContainer = $container.find('.popup-bg');
+            if (setStatic === true) {
+                $popupBgContainer.css({"height": $popupBgContainer.height(), "width": $popupBgContainer.width()});
+            }
+            else {
+                $popupBgContainer.css({"height": "", "width": ""});
+            }
+        },
+        preparePopupContainerObject: function () {
+            if (popupManager.$currentPopupContainerObject !== false) {
+                return true;
+            }
+            var $container = $(popupManager.POPUP_CONTAINER_TEMPLATE_SELECTOR).clone();
+            $container.attr('id', popupManager.POPUP_CONTAINER_OBJECT_SELECTOR);
+            $container.removeClass('template');
+            popupManager.$currentPopupContainerObject = $container;
+            $container.appendTo('body');
+            return $container;
+        },
+        initDefaultEvents: function ($wrapper) {
+            $wrapper.find('input').on('change keydown', function () {
+                $(this).removeClass('error');
+                var $nextElem = $(this).next();
+                if ($nextElem.hasClass('input-error')) {
+                    $nextElem.html('');
+                }
+            });
+        },
+        showValidationInfo: function ($inputsWrapper, validationList) {
+            console.log(validationList);
+            for (var key in validationList) {
+                $inputsWrapper.find('.' + key + ' + div.input-error').html(validationList[key][0]);
+            }
+        }
+
+
+    };
+    function setCookie(name, value, options) {
+        options = options || {};
+        var expires = options.expires;
+        if (typeof expires == "number" && expires) {
+            var d = new Date();
+            d.setTime(d.getTime() + expires * 1000);
+            expires = options.expires = d;
+        }
+        if (expires && expires.toUTCString) {
+            options.expires = expires.toUTCString();
+        }
+        value = encodeURIComponent(value);
+        var updatedCookie = name + "=" + value;
+        for (var propName in options) {
+            updatedCookie += "; " + propName;
+            var propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += "=" + propValue;
+            }
+        }
+        document.cookie = updatedCookie;
+    }
+    // возвращает cookie с именем name, если есть, если нет, то undefined
+    function getCookie(name) {
+        var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+</script>
+</body>
+</html>

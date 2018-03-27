@@ -1,0 +1,22 @@
+.search-box {
+    height: 20px;
+    width: 250px;
+}
+.button {
+    width: 70px;
+    height: 26px;
+    font-size: 15px;
+    background: darkgray;
+    border: 1px grey solid;
+}
+.search-area {
+    display: none;
+    width: 253px;
+    min-height: 50px;
+    border: 1px solid darkgray;
+    margin-top: 5px;
+}
+.search-area .get-cites {
+    margin: 0;
+    padding: 10px 5px;
+}
