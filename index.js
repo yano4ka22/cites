@@ -6,13 +6,15 @@ class AutoComplete {
 
     init(count) {
         this.addContent(count);
-        this.addEvent();
+        let countTab = 0;
+        let actionBefore = 0;
+        this.addEvent(countTab, actionBefore);
     }
 
     addContent(number) {
         let text = '<form action="" method="get">\n' +
-            '    <input type="text" class="search-box" id="search-box' + number + '" autocomplete="off">\n' +
-            '    <input type="button" class="button" id="button' + number + '" value="Поиск">\n' +
+            '<input type="text" class="search-box" id="search-box' + number + '" autocomplete="off">\n' +
+            '<input type="button" class="button" id="button' + number + '" value="Поиск">\n' +
             '</form>\n' + '<div class="search-area" id="search-area' + number + '"></div>';
         this.rootBox.innerHTML = text;
         this.searchBox = document.getElementById('search-box' + number);
@@ -20,7 +22,7 @@ class AutoComplete {
         this.searchArea = document.getElementById('search-area' + number);
     }
 
-    addEvent() {
+    addEvent(countTab, actionBefore) {
         let self = this;
         this.button.addEventListener('click', function () {
             let findCities = self.getCity(self.searchBox.value);
@@ -52,21 +54,40 @@ class AutoComplete {
         this.searchBox.addEventListener('keydown', function (event) {
             let getCites = self.searchArea.getElementsByTagName('p');
             if (event.keyCode === 40) {
-                for (let i = 0; i < getCites.length; i++){
-                    if (getCites[i].classList.contains('darkGrayElement')) {
-                        self.darkGrayElement(getCites[i + 1]);
-                        self.transparentElement(getCites[i]);
-                        break;
-                    } else {
-                        self.darkGrayElement(getCites[0]);
+                if (actionBefore === 2) countTab++;
+                if (countTab === 0) {
+                    self.darkGrayElement(getCites[0]);
+                    if (getCites[getCites.length - 1].classList.contains('darkGrayElement')) {
+                        self.transparentElement(getCites[getCites.length - 1]);
                     }
+                    countTab++;
+                } else {
+                    self.darkGrayElement(getCites[countTab]);
+                    self.transparentElement(getCites[countTab - 1]);
+                    countTab++;
+                    if (countTab === getCites.length) countTab = 0;
                 }
+                actionBefore = 1;
             } else if (event.keyCode === 38) {
+                if (actionBefore === 1) countTab--;
+                if (countTab === 0) {
+                    self.darkGrayElement(getCites[getCites.length - 1]);
+                    if (getCites[0].classList.contains('darkGrayElement')) {
+                        self.transparentElement(getCites[0]);
+                    }
+                    countTab = getCites.length - 1;
+                } else {
+                    self.darkGrayElement(getCites[countTab - 1]);
+                    self.transparentElement(getCites[countTab]);
+                    countTab--;
+                }
+                actionBefore = 2;
             } else if (event.keyCode === 13) {
-                /*event.preventDefault();
-                self.searchBox.value = getCites[self.count].textContent;
+                event.preventDefault();
+                self.searchBox.value = getCites[countTab - 1].textContent;
                 self.searchArea.innerHTML = '';
-                self.hideElement(self.searchArea);*/
+                self.hideElement(self.searchArea);
+                countTab = 0;
             }
         });
     }
@@ -92,7 +113,6 @@ class AutoComplete {
             p.innerHTML = findCities[i];
             this.searchArea.appendChild(p);
         }
-        console.log(findCities);
     }
 
     showElement(element) {
